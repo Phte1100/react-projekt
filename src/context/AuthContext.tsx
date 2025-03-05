@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     
         try {
-            const res = await fetch("https://backend-baserad-webbutveckling-moment-5.onrender.com/api/validate", {
+            const res = await fetch("http://127.0.0.1:3000/validate", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Login-funktion
     const login = async (credentials: LoginCredentials) => {
         try {
-            const response = await fetch("https://backend-baserad-webbutveckling-moment-5.onrender.com/api/login", {
+            const response = await fetch("http://127.0.0.1:3000/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://backend-baserad-webbutveckling-moment-5.onrender.com/books";
+const API_URL = "http://127.0.0.1:3000";
 
 interface BookItem {
   isbn: string;
@@ -28,7 +28,7 @@ interface NewBookItem {
 }
 
 // Hämta alla böcker
-const getAllBookItems = () => axios.get<BookItem[]>(`${API_URL}`);
+const getAllBookItems = () => axios.get<BookItem[]>(`${API_URL}/books`);
 
 // Hämta en bok via ISBN
 const getBookItemByISBN = (isbn: string) => axios.get<BookItem>(`${API_URL}/${isbn}`);
@@ -47,13 +47,13 @@ const updateBookItem = (isbn: string, bookItem: Partial<BookItem>, token: string
 
 // Radera en bok (kräver autentisering)
 const deleteBookItem = (isbn: string, token: string | null) =>
-  axios.delete(`${API_URL}/${isbn}`, {
+  axios.delete(`${API_URL}/books/${isbn}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
 // Gilla en bok (kräver autentisering)
 const likeBookItem = (isbn: string, token: string | null) =>
-  axios.post(`${API_URL}/${isbn}/like`, {}, {
+  axios.post(`${API_URL}/books/${isbn}/like`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

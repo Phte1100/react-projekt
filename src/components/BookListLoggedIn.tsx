@@ -122,7 +122,7 @@ const BookListLoggedIn: React.FC = () => {
       {token && (
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <EditBookItem
-            BookItemId={selectedItemId} // Ändrat från bookItemId
+            bookItemId={selectedItemId} // Rätt namn matchar EditBookItemProps
             onClose={() => setIsModalOpen(false)}
             refreshBook={fetchBooks}
           />

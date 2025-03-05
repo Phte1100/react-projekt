@@ -3,11 +3,15 @@ import { getAllBookItems } from "../services/BookService";
 import { NavLink } from "react-router-dom";
 
 interface BookItem {
-  _id: string;
-  name: string;
-  price: number;
+  isbn: string;
+  title: string;
+  author: string;
+  publishedYear: number;
   description?: string;
-  category?: string;
+  excerpt?: string;
+  thumbnail?: string;
+  genre?: string;
+  format?: string;
 }
 
 const BookList: React.FC = () => {
@@ -23,7 +27,7 @@ const BookList: React.FC = () => {
       const response = await getAllBookItems();
       setBookItems(response.data);
     } catch (error) {
-      console.error("Error fetching Book items:", error);
+      console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
     }
@@ -31,7 +35,7 @@ const BookList: React.FC = () => {
 
   return (
     <>
-      <h2 className="title">Meny</h2>
+      <h2 className="title">Tillgängliga Böcker</h2>
 
       {loading ? (
         <p className="loading">Hämtar data...</p>
@@ -39,25 +43,37 @@ const BookList: React.FC = () => {
         <table className="table is-fullwidth">
           <thead>
             <tr>
-              <th>Namn</th>
-              <th>Pris</th>
-              <th></th>
+              <th>Bild</th>
+              <th>Titel</th>
+              <th>Författare</th>
+              <th>Utgivningsår</th>
+              <th>Genre</th>
+              <th>Format</th>
+              <th>Info</th>
             </tr>
           </thead>
           <tbody>
             {bookItems.map((item) => (
-              <tr key={item._id}>
-                <td>{item.name}</td>
-                <td>{item.price} kr</td>
+              <tr key={item.isbn}>
                 <td>
-                  {/* Länk till DetailPage för att visa enskild meny */}
-                  <NavLink to={`/book/${item._id}`} className="button is-info">
+                  {item.thumbnail ? (
+                    <img src={item.thumbnail} alt={item.title} style={{ width: "50px" }} />
+                  ) : (
+                    "Ingen bild"
+                  )}
+                </td>
+                <td>{item.title}</td>
+                <td>{item.author}</td>
+                <td>{item.publishedYear}</td>
+                <td>{item.genre}</td>
+                <td>{item.format}</td>
+                <td>
+                  <NavLink to={`/book/${item.isbn}`} className="button is-info">
                     Mer information
                   </NavLink>
                 </td>
               </tr>
             ))}
-            
           </tbody>
         </table>
       )}
