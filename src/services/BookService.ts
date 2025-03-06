@@ -36,7 +36,6 @@ const getBookItemByISBN = (isbn: string, token: string | null) =>
     headers: token ? { Authorization: `Bearer ${token}` } : {}, // Skicka token om den finns
   });
 
-
 // Skapa en ny bok (kräver autentisering)
 const createBookItem = (bookItem: { isbn: string; format: string }, token: string | null) =>
   axios.post(`${API_URL}/books`, bookItem, {
@@ -64,6 +63,17 @@ const likeBookItem = (isbn: string, token: string | null) =>
   axios.post(`${API_URL}/books/${isbn}/like`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+// Skapa en ny användare (registrering)
+const registerUser = (userData: { username: string; email: string; password: string; role: string }) =>
+  axios.post(`${API_URL}/users`, userData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+export { registerUser };
+
 
 export { 
   getAllBookItems, 

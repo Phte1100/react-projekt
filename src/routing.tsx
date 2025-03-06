@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DetailPage from "./pages/DetailPage";
+import RegisterPage from "./pages/RegisterPage";
 
 const router = createBrowserRouter([
     {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
             {
                 path: "/menu/:id",
                 element: <DetailPage /> // Lägg till route för enskilda menyobjekt
+            },
+            {
+                path: "/register",
+                element: <RegisterPage />
             }
         ]
     }

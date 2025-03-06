@@ -3,6 +3,7 @@ import AboutPage from "./pages/CmsPage";
 import HomePage from "./pages/HomePage";
 import BookList from "./components/BookList";
 import DetailPage from "./pages/DetailPage";
+import RegisterPage from "./pages/RegisterPage";
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/menu" element={<BookList />} />
         <Route path="/menu/:id" element={<DetailPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </Router>
   );
