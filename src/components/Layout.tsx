@@ -6,7 +6,7 @@ const Layout = () => { // Layout för sidan
       <>
       <Header />
       <main>
-        <div className="text-container">
+        <div className="container is-fluid">
         <Outlet />
         </div>
       </main>

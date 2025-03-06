@@ -20,60 +20,45 @@ interface EditBookItemProps {
 }
 
 const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refreshBook }) => {
-  const [bookItem, setBookItem] = useState<BookItem>({
-    isbn: "",
-    title: "",
-    author: "",
-    publishedYear: 0,
-    description: "",
-    excerpt: "",
-    thumbnail: "",
-    genre: "",
-    format: "hardcover", // Default format
-  });
+  const [bookItem, setBookItem] = useState<BookItem | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!bookItemId) return;
+
     fetchBookItem(bookItemId);
   }, [bookItemId]);
 
   const fetchBookItem = async (isbn: string) => {
     try {
-      const response = await getBookItemByISBN(isbn);
+      setLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem("token");
+      const response = await getBookItemByISBN(isbn, token);
+
       if (!response.data) {
-        console.error("No data received from API!");
-        return;
+        throw new Error("No data received from API!");
       }
 
-      const bookData = response.data;
-
-      setBookItem({
-        isbn: bookData.isbn || "",
-        title: bookData.title || "",
-        author: bookData.author || "",
-        publishedYear: bookData.publishedYear || 0,
-        description: bookData.description || "",
-        excerpt: bookData.excerpt || "",
-        thumbnail: bookData.thumbnail || "",
-        genre: bookData.genre || "",
-        format: bookData.format || "hardcover", // Sätt default format om det saknas
-      });
+      setBookItem(response.data);
     } catch (error) {
       console.error("Error fetching book item:", error);
+      setError("Kunde inte hämta bokinformationen.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setBookItem((prev) => ({
-      ...prev,
-      [name]: name === "publishedYear" ? Number(value) || 0 : value,
-    }));
+    setBookItem((prev) => prev ? { ...prev, [name]: name === "publishedYear" ? Number(value) || 0 : value } : null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bookItem.isbn) return;
+    if (!bookItem) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -82,8 +67,13 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
       onClose();
     } catch (error) {
       console.error("Error updating book item:", error);
+      setError("Kunde inte uppdatera boken.");
     }
   };
+
+  if (loading) return <p>Laddar...</p>;
+  if (error) return <p className="has-text-danger">{error}</p>;
+  if (!bookItem) return <p className="has-text-warning">Ingen bok vald.</p>;
 
   return (
     <form onSubmit={handleSubmit}>

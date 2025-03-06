@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import router from './routing.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import "bulma/css/bulma.min.css";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

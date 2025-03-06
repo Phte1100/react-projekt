@@ -31,13 +31,21 @@ interface NewBookItem {
 const getAllBookItems = () => axios.get<BookItem[]>(`${API_URL}/books`);
 
 // Hämta en bok via ISBN
-const getBookItemByISBN = (isbn: string) => axios.get<BookItem>(`${API_URL}/${isbn}`);
+const getBookItemByISBN = (isbn: string, token: string | null) =>
+  axios.get<BookItem>(`${API_URL}/books/${isbn}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}, // Skicka token om den finns
+  });
+
 
 // Skapa en ny bok (kräver autentisering)
-const createBookItem = (bookItem: NewBookItem, token: string | null) =>
-  axios.post<BookItem>(`${API_URL}/add-book`, bookItem, {
-    headers: { Authorization: `Bearer ${token}` },
+const createBookItem = (bookItem: { isbn: string; format: string }, token: string | null) =>
+  axios.post(`${API_URL}/books`, bookItem, {
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"  
+    },
   });
+
 
 // Uppdatera en bok (kräver autentisering)
 const updateBookItem = (isbn: string, bookItem: Partial<BookItem>, token: string | null) =>

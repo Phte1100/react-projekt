@@ -26,15 +26,19 @@ const AddBookItem: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => { 
     e.preventDefault();
+    console.log("Skickar till API:", bookItem); // 🛠 Logga ut vad som skickas
+  
     try {
-      await createBookItem(bookItem, token);
+      await createBookItem({ isbn: bookItem.isbn, format: bookItem.format }, token);
+      console.log("Bok tillagd!");
       navigate("/");
     } catch (error) {
       console.error("Error creating book item:", error);
     }
   };
+  
 
   return (
     <div>

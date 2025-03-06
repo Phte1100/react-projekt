@@ -24,7 +24,8 @@ const DetailPage: React.FC = () => {
 
     const fetchBookItem = async () => {
       try {
-        const response = await getBookItemByISBN(isbn);
+        const token = localStorage.getItem("token"); // Hämta token
+        const response = await getBookItemByISBN(isbn, token); // Skicka token
         setBookItem(response.data);
       } catch (error) {
         console.error("Error fetching book item:", error);

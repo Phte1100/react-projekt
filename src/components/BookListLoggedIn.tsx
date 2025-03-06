@@ -119,15 +119,25 @@ const BookListLoggedIn: React.FC = () => {
         </tbody>
       </table>
 
-      {token && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <EditBookItem
-            bookItemId={selectedItemId} // Rätt namn matchar EditBookItemProps
-            onClose={() => setIsModalOpen(false)}
-            refreshBook={fetchBooks}
-          />
-        </Modal>
-      )}
+      {token && selectedItemId && (
+  <Modal
+    isOpen={isModalOpen}
+    onClose={() => {
+      setIsModalOpen(false);
+      setSelectedItemId(null); // Återställ ID
+    }}
+  >
+    <EditBookItem
+      bookItemId={selectedItemId}
+      onClose={() => {
+        setIsModalOpen(false);
+        setSelectedItemId(null);
+      }}
+      refreshBook={fetchBooks}
+    />
+  </Modal>
+)}
+
     </div>
   );
 };
