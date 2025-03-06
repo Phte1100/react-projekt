@@ -13,6 +13,7 @@ interface BookItem {
   genre?: string;
   format?: string;
   likes: number;
+  userHasLiked: boolean
 }
 
 interface NewBookItem {
@@ -72,6 +73,30 @@ const registerUser = (userData: { username: string; email: string; password: str
     },
   });
 
+// Hämta recensioner för en bok
+const getReviewsForBook = (isbn: string) =>
+  axios.get(`${API_URL}/books/${isbn}/reviews`);
+
+// Skapa en ny recension (kräver autentisering)
+const addReview = (isbn: string, rating: number, review_text: string, token: string | null) =>
+  axios.post(
+    `${API_URL}/books/${isbn}/reviews`,
+    { rating, review_text },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+// Gilla en recension (kräver autentisering)
+const likeReview = (reviewId: number, token: string | null) =>
+  axios.post(`${API_URL}/reviews/${reviewId}/like`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+// Ta bort en recension (kräver autentisering)
+const deleteReview = (reviewId: number, token: string | null) =>
+  axios.delete(`${API_URL}/reviews/${reviewId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
 export { registerUser };
 
 
@@ -81,5 +106,9 @@ export {
   createBookItem, 
   updateBookItem, 
   deleteBookItem, 
-  likeBookItem 
+  likeBookItem,
+  getReviewsForBook,
+  addReview,
+  likeReview,
+  deleteReview
 };

@@ -14,6 +14,7 @@ interface BookItem {
   genre?: string;
   format?: string;
   likes: number;
+  userHasLiked: boolean;
 }
 
 const BookListLoggedIn: React.FC = () => {
@@ -30,11 +31,19 @@ const BookListLoggedIn: React.FC = () => {
   const fetchBooks = async () => {
     try {
       const response = await getAllBookItems();
-      setBookItems(response.data);
+  
+      // Se till att varje bok innehåller userHasLiked
+      const booksWithLikes = response.data.map((book) => ({
+        ...book,
+        userHasLiked: book.userHasLiked ?? false, // Sätter till false om det saknas
+      }));
+  
+      setBookItems(booksWithLikes);
     } catch (error) {
       console.error("Error fetching books:", error);
     }
   };
+  
 
     const handleDelete = async (isbn: string) => {
       try {
@@ -55,12 +64,14 @@ const BookListLoggedIn: React.FC = () => {
           console.error("Unauthorized: No token found.");
           return;
         }
-        await likeBookItem(isbn, token); // Skickar token
-        fetchBooks();
+    
+        await likeBookItem(isbn, token);
+        fetchBooks(); // Uppdatera böckerna efter toggling
       } catch (error) {
-        console.error("Error liking book:", error);
+        console.error("Error toggling like:", error);
       }
     };
+        
   
 
   return (
@@ -94,8 +105,11 @@ const BookListLoggedIn: React.FC = () => {
               <td>{item.genre}</td>
               <td>{item.format}</td>
               <td>
-                <button className="button is-small is-primary" onClick={() => handleLike(item.isbn)}>
-                  ❤️ {item.likes}
+                <button
+                  className={`button is-small ${item.userHasLiked ? "is-danger" : "is-primary"}`}
+                  onClick={() => handleLike(item.isbn)}
+                >
+                  {item.userHasLiked ? "💔 Ta bort gilla" : "❤️ Gilla"} {item.likes}
                 </button>
               </td>
               {token && (

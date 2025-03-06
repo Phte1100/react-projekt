@@ -29,7 +29,7 @@ const router = createBrowserRouter([
                 element: <LoginPage />
             },
             {
-                path: "/menu/:id",
+                path: "/book/:isbn",
                 element: <DetailPage /> // Lägg till route för enskilda menyobjekt
             },
             {
