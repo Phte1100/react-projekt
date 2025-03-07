@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { getBookItemByISBN, getReviewsForBook, addReview, likeReview, deleteReview } from "../services/BookService";
+import { getReviewsForBook, addReview, deleteReview } from "../services/BookService";
 
 interface Review {
   id: number;
@@ -13,31 +12,32 @@ interface Review {
   created_at: string;
 }
 
-const BookReviews: React.FC = () => {
-  const { isbn } = useParams<{ isbn?: string }>(); // Hanterar undefined
+interface BookReviewsProps {
+  isbn: string;
+}
+
+const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [bookTitle, setBookTitle] = useState<string>(""); // För att visa boktitel
   const [newReview, setNewReview] = useState({ rating: 5, review_text: "" });
   const token = localStorage.getItem("token");
 
+  // ✅ Hämta `user_id` från JWT-tokenet (om det finns)
+  let userId: number | null = null;
+  if (token) {
+    try {
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      userId = decodedToken.id;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+
   useEffect(() => {
     if (!isbn) return;
-
-    const fetchBookData = async () => {
-      try {
-        const response = await getBookItemByISBN(isbn, token);
-        setBookTitle(response.data.title);
-      } catch (error) {
-        console.error("Error fetching book item:", error);
-      }
-    };
-
-    fetchBookData();
     fetchReviews();
   }, [isbn]);
 
   const fetchReviews = async () => {
-    if (!isbn) return;
     try {
       const response = await getReviewsForBook(isbn);
       setReviews(response.data);
@@ -48,9 +48,12 @@ const BookReviews: React.FC = () => {
 
   const handleReviewSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!isbn) return;
+    if (!isbn || !token || userId === null) return; // Kontrollera att vi har en giltig användare
+
     try {
-      await addReview(isbn, newReview.rating, newReview.review_text, token);
+      console.log("Skickar recension till API:", { user_id: userId, book_isbn: isbn, rating: newReview.rating, review_text: newReview.review_text });
+      
+      await addReview(isbn, newReview.rating, newReview.review_text, token, userId);
       setNewReview({ rating: 5, review_text: "" });
       fetchReviews();
     } catch (error) {
@@ -58,18 +61,12 @@ const BookReviews: React.FC = () => {
     }
   };
 
-  const handleLikeReview = async (reviewId: number) => {
-    try {
-      await likeReview(reviewId, token);
-      fetchReviews();
-    } catch (error) {
-      console.error("Error liking review:", error);
-    }
-  };
-
   const handleDeleteReview = async (reviewId: number) => {
+    if (!token || userId === null) return;
+
     try {
-      await deleteReview(reviewId, token);
+      console.log("Försöker ta bort recension med ID:", reviewId);
+      await deleteReview(reviewId, token, userId); // ✅ Skicka `userId` med anropet
       fetchReviews();
     } catch (error) {
       console.error("Error deleting review:", error);
@@ -78,7 +75,7 @@ const BookReviews: React.FC = () => {
 
   return (
     <div>
-      <h2 className="title is-4">Recensioner för "{bookTitle}"</h2>
+      <h2 className="title is-4">Recensioner</h2>
 
       {reviews.length > 0 ? (
         reviews.map((review) => (
@@ -86,15 +83,11 @@ const BookReviews: React.FC = () => {
             <p><strong>{review.username}</strong> ({review.rating} ⭐)</p>
             <p>{review.review_text}</p>
             <p className="is-size-7 has-text-grey">{new Date(review.created_at).toLocaleString()}</p>
-            <button 
-              className="button is-small is-primary"
-              onClick={() => handleLikeReview(review.id)}
-            >
-              ❤️ {review.likes}
-            </button>
-            {token && (
-              <button
-                className="button is-small is-danger ml-2"
+
+            {/* ✅ Visa "Ta bort" endast om användaren skrev recensionen */}
+            {userId === review.user_id && (
+              <button 
+                className="button is-small is-danger"
                 onClick={() => handleDeleteReview(review.id)}
               >
                 🗑 Ta bort
@@ -146,5 +139,7 @@ const BookReviews: React.FC = () => {
     </div>
   );
 };
+
+
 
 export default BookReviews;

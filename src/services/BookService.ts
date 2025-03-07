@@ -78,24 +78,31 @@ const getReviewsForBook = (isbn: string) =>
   axios.get(`${API_URL}/books/${isbn}/reviews`);
 
 // Skapa en ny recension (kräver autentisering)
-const addReview = (isbn: string, rating: number, review_text: string, token: string | null) =>
-  axios.post(
+const addReview = (isbn: string, rating: number, review_text: string, token: string | null, userId: number) => {
+  console.log("Skickar token:", token); // 🛠 Logga token
+  console.log("Skickar user_id:", userId); // 🛠 Logga user_id
+
+  return axios.post(
     `${API_URL}/books/${isbn}/reviews`,
-    { rating, review_text },
-    { headers: { Authorization: `Bearer ${token}` } }
+    { user_id: userId, rating, review_text }, // ✅ Skicka `user_id`
+    {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
+};
 
-// Gilla en recension (kräver autentisering)
-const likeReview = (reviewId: number, token: string | null) =>
-  axios.post(`${API_URL}/reviews/${reviewId}/like`, {}, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-// Ta bort en recension (kräver autentisering)
-const deleteReview = (reviewId: number, token: string | null) =>
+const deleteReview = (reviewId: number, token: string | null, userId: number) =>
   axios.delete(`${API_URL}/reviews/${reviewId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    data: { user_id: userId } // Skicka user_id i request-body
   });
+
 
 export { registerUser };
 
@@ -109,6 +116,5 @@ export {
   likeBookItem,
   getReviewsForBook,
   addReview,
-  likeReview,
   deleteReview
 };
