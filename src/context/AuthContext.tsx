@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
     
             const data = await res.json();
-            console.log("Token är giltig:", data.user); //Debug-logga
+            console.log("Token är giltig:", data.user, data.username); //Debug-logga
             setUser(data.user);
         } catch (error) {
             console.error("Token validation failed:", error);

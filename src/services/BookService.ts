@@ -3,6 +3,7 @@ import axios from "axios";
 const API_URL = "http://127.0.0.1:3000";
 
 interface BookItem {
+  published_year: number;
   isbn: string;
   title: string;
   author: string;
@@ -14,18 +15,6 @@ interface BookItem {
   format?: string;
   likes: number;
   userHasLiked: boolean
-}
-
-interface NewBookItem {
-  isbn: string;
-  title: string;
-  author: string;
-  publishedYear: number;
-  description?: string;
-  excerpt?: string;
-  thumbnail?: string;
-  genre?: string;
-  format?: string;
 }
 
 // Hämta alla böcker
@@ -49,7 +38,7 @@ const createBookItem = (bookItem: { isbn: string; format: string }, token: strin
 
 // Uppdatera en bok (kräver autentisering)
 const updateBookItem = (isbn: string, bookItem: Partial<BookItem>, token: string | null) =>
-  axios.put<BookItem>(`${API_URL}/${isbn}`, bookItem, {
+  axios.put<BookItem>(`${API_URL}/books/${isbn}`, bookItem, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

@@ -5,7 +5,7 @@ import AddMenuItem from '../components/AddBookItem';
 const CmsPage = () => {
 
   const { user } = useAuth();
-
+  console.log("User object:", user);
 
   return (
     <>

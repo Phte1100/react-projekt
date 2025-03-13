@@ -8,6 +8,7 @@ interface BookItem {
   title: string;
   author: string;
   publishedYear: number;
+  published_year?: number;
   description?: string;
   excerpt?: string;
   thumbnail?: string;
@@ -27,13 +28,22 @@ const DetailPage: React.FC = () => {
     const fetchBookItem = async () => {
       try {
         const response = await getBookItemByISBN(isbn, token);
-        setBookItem(response.data);
+        const bookData = response.data;
+    
+        // 🔄 Mappa om `published_year` till `publishedYear`
+        const mappedBook = {
+          ...bookData,
+          publishedYear: bookData.published_year ?? 0, 
+        };
+    
+        setBookItem(mappedBook);
       } catch (error) {
         console.error("Error fetching book item:", error);
       } finally {
         setLoading(false);
       }
     };
+    
 
     fetchBookItem();
   }, [isbn]);
@@ -42,23 +52,37 @@ const DetailPage: React.FC = () => {
   if (!bookItem) return <p>Boken kunde inte hittas.</p>;
 
   return (
-    <div>
-      <h2 className="title is-2">{bookItem.title}</h2>
-      <div className="content">
-        {bookItem.thumbnail && (
-          <img src={bookItem.thumbnail} alt={bookItem.title} style={{ maxWidth: "200px", marginBottom: "10px" }} />
-        )}
-        <p><strong>Författare:</strong> {bookItem.author || "Okänd"}</p>
-        <p><strong>Utgivningsår:</strong> {bookItem.publishedYear}</p>
-        <p><strong>Genre:</strong> {bookItem.genre || "Ingen genre"}</p>
-        <p><strong>Format:</strong> {bookItem.format || "Okänt format"}</p>
-        <p><strong>Beskrivning:</strong> {bookItem.description || "Ingen beskrivning"}</p>
-        {bookItem.excerpt && (
-          <p><strong>Utdrag:</strong> {bookItem.excerpt}</p>
-        )}
-      </div>
+<div className="container" style={{ maxWidth: "800px" }}>
+      <div className="book-details">
+        <h2 className="title has-text-centered">{bookItem.title}</h2>
 
-      {/* 🔥 Lägger till recensioner */}
+        <div className="columns is-centered">
+          <div className="column is-narrow">
+            {bookItem.thumbnail ? (
+              <img
+                src={bookItem.thumbnail}
+                alt={bookItem.title}
+                className="book-thumbnail"
+              />
+            ) : (
+              <p className="has-text-centered">Ingen bild tillgänglig</p>
+            )}
+          </div>
+
+          <div className="column">
+            <p><strong>Författare:</strong> {bookItem.author || "Okänd"}</p>
+            <p><strong>Utgivningsår:</strong> {bookItem.publishedYear || "Okänt"}</p>
+            <p><strong>Genre:</strong> {bookItem.genre || "Ingen genre"}</p>
+            <p><strong>Format:</strong> {bookItem.format || "Okänt format"}</p>
+          </div>
+        </div>
+
+        <div className="content">
+          <p><strong>Beskrivning:</strong> {bookItem.description || "Ingen beskrivning"}</p>
+        </div>
+      </div>
+      <br></br>
+      {/* Lägger till recensioner */}
       <BookReviews isbn={isbn ?? ""} />
     </div>
   );

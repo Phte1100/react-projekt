@@ -1,70 +1,74 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { createBookItem } from "../services/BookService";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+// Valideringsschema
+const schema = yup.object().shape({
+  isbn: yup
+    .string()
+    .matches(/^\d+$/, "Endast siffror tillåtna")
+    .min(10, "ISBN måste vara minst 10 siffror")
+    .max(13, "ISBN får vara max 13 siffror")
+    .required("ISBN är obligatoriskt"),
+  format: yup.string().required("Format måste väljas"),
+});
 
 const AddBookItem: React.FC = () => {
-  const [bookItem, setBookItem] = useState({
-    isbn: "",
-    title: "",
-    author: "",
-    publishedYear: 0,
-    description: "",
-    excerpt: "",
-    thumbnail: "",
-    genre: "",
-    format: "hardcover", // Standardformat
-  });
-
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setBookItem((prev) => ({
-      ...prev,
-      [name]: name === "publishedYear" ? parseInt(value) || 0 : value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
 
-  const handleSubmit = async (e: React.FormEvent) => { 
-    e.preventDefault();
-    console.log("Skickar till API:", bookItem); // 🛠 Logga ut vad som skickas
-  
+  // Hantera formulärskickning
+  const onSubmit = async (data: { isbn: string; format: string }) => {
     try {
-      await createBookItem({ isbn: bookItem.isbn, format: bookItem.format }, token);
-      console.log("Bok tillagd!");
+      await createBookItem(data, token);
+      toast.success("Bok tillagd!");
       navigate("/");
     } catch (error) {
+      toast.error("Misslyckades med att lägga till boken");
       console.error("Error creating book item:", error);
     }
   };
-  
 
   return (
     <div>
       <h2 className="title is-4">Lägg till en ny bok</h2>
-      <form onSubmit={handleSubmit}>
-
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="field">
           <label className="label">ISBN</label>
           <div className="control">
-            <input type="text" name="isbn" value={bookItem.isbn} onChange={handleChange} required className="input" />
+            <input
+              type="text"
+              className="input"
+              {...register("isbn")}
+              placeholder="Ange ISBN (endast siffror)"
+            />
           </div>
+          <p className="has-text-danger">{errors.isbn?.message}</p>
         </div>
-
-        
 
         <div className="field">
           <label className="label">Format</label>
           <div className="control">
             <div className="select">
-              <select name="format" value={bookItem.format} onChange={handleChange}>
+              <select {...register("format")}>
                 <option value="hardcover">Inbunden</option>
                 <option value="paperback">Pocket</option>
                 <option value="ebook">E-bok</option>
               </select>
             </div>
           </div>
+          <p className="has-text-danger">{errors.format?.message}</p>
         </div>
 
         <div className="field">
@@ -74,7 +78,6 @@ const AddBookItem: React.FC = () => {
             </button>
           </div>
         </div>
-
       </form>
     </div>
   );

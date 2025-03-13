@@ -1,95 +1,86 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/BookService"; // Lägg till funktionen i BookService.ts
+import { registerUser } from "../services/BookService"; // Använd rätt tjänst
+import { toast } from "react-toastify";
+
+// Valideringsschema med Yup
+const schema = yup.object().shape({
+  username: yup
+    .string()
+    .min(4, "Användarnamnet måste vara minst 4 tecken långt")
+    .matches(/^[a-zA-Z0-9]+$/, "Användarnamnet får bara innehålla bokstäver och siffror")
+    .required("Användarnamn är obligatoriskt"),
+  email: yup.string().email("Ogiltig e-post").required("E-post är obligatoriskt"),
+  password: yup
+    .string()
+    .min(6, "Lösenordet måste vara minst 6 tecken långt")
+    .matches(/[0-9]/, "Lösenordet måste innehålla minst en siffra")
+    .matches(/[!@#$%^&*]/, "Lösenordet måste innehålla minst ett specialtecken (!@#$%^&*)")
+    .required("Lösenord är obligatoriskt"),
+});
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    role: "user", // Standardroll
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const navigate = useNavigate();
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  // Automatisk trimning av användarnamn vid input
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const trimmedValue = event.target.value.trim();
+    setValue("username", trimmedValue, { shouldValidate: true });
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (formData.password.length < 6) {
-      setError("Lösenordet måste vara minst 6 tecken långt.");
-      return;
-    }
-
+  const onSubmit = async (data: any) => {
     try {
-      await registerUser(formData);
-      setSuccess(true);
-      setTimeout(() => navigate("/login"), 2000); // Omdirigera till login efter 2 sekunder
-    } catch (err) {
-      setError("Registrering misslyckades. Prova igen.");
+      await registerUser(data);
+      toast.success("Användare skapad! Omdirigerar till inloggning...");
+      setTimeout(() => navigate("/login"), 2000); // Omdirigering efter 2 sek
+    } catch (error) {
+      toast.error("Registrering misslyckades. Försök igen.");
     }
   };
 
   return (
     <>
       <h1 className="title is-1">Registrera</h1>
-      
-      {success && <p className="has-text-success">Användare skapad! Omdirigerar till inloggning...</p>}
-      {error && <p className="has-text-danger">{error}</p>}
-      
-      <form onSubmit={handleSubmit} className="box">
+
+      <form onSubmit={handleSubmit(onSubmit)} className="box">
         <div className="field">
           <label className="label">Användarnamn</label>
           <div className="control">
             <input
-              name="username"
               className="input"
               type="text"
-              placeholder="Skriv ditt användarnamn"
-              value={formData.username}
-              onChange={handleChange}
-              required
+              placeholder="Ange användarnamn"
+              {...register("username")}
+              onChange={handleUsernameChange} // Trimmar input automatiskt
             />
           </div>
+          <p className="help is-danger">{errors.username?.message}</p>
         </div>
 
         <div className="field">
           <label className="label">E-post</label>
           <div className="control">
-            <input
-              name="email"
-              className="input"
-              type="email"
-              placeholder="Ange din e-post"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+            <input className="input" type="email" placeholder="Ange din e-post" {...register("email")} />
           </div>
+          <p className="help is-danger">{errors.email?.message}</p>
         </div>
 
         <div className="field">
           <label className="label">Lösenord</label>
           <div className="control">
-            <input
-              name="password"
-              className="input"
-              type="password"
-              placeholder="Ange ett lösenord (minst 6 tecken)"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <input className="input" type="password" placeholder="Ange lösenord" {...register("password")} />
           </div>
+          <p className="help is-danger">{errors.password?.message}</p>
         </div>
 
         <div className="field">

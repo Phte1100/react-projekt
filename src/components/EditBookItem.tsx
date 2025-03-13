@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getBookItemByISBN, updateBookItem } from "../services/BookService";
+import { toast } from "react-toastify"; // ✅ Importera toast för bekräftelse
 
 interface BookItem {
   isbn: string;
   title: string;
   author: string;
-  publishedYear: number;
   description?: string;
   excerpt?: string;
   thumbnail?: string;
@@ -26,7 +26,6 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
 
   useEffect(() => {
     if (!bookItemId) return;
-
     fetchBookItem(bookItemId);
   }, [bookItemId]);
 
@@ -53,7 +52,7 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setBookItem((prev) => prev ? { ...prev, [name]: name === "publishedYear" ? Number(value) || 0 : value } : null);
+    setBookItem((prev) => prev ? { ...prev, [name]: value } : null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,11 +62,15 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
     try {
       const token = localStorage.getItem("token");
       await updateBookItem(bookItem.isbn, bookItem, token);
+      
+      // ✅ Visa en toast-bekräftelse när PUT är klar
+      toast.success("Boken har uppdaterats!");
+
       refreshBook();
       onClose();
     } catch (error) {
+      toast.error("Kunde inte uppdatera boken."); // ❌ Visar felmeddelande vid misslyckad uppdatering
       console.error("Error updating book item:", error);
-      setError("Kunde inte uppdatera boken.");
     }
   };
 
@@ -90,13 +93,6 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
         <label className="label">Författare</label>
         <div className="control">
           <input className="input" type="text" name="author" value={bookItem.author} onChange={handleChange} required />
-        </div>
-      </div>
-
-      <div className="field">
-        <label className="label">Utgivningsår</label>
-        <div className="control">
-          <input className="input" type="number" name="publishedYear" value={bookItem.publishedYear} onChange={handleChange} required />
         </div>
       </div>
 

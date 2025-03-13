@@ -5,6 +5,8 @@ import BookList from "./components/BookList";
 import DetailPage from "./pages/DetailPage";
 import RegisterPage from "./pages/RegisterPage";
 
+import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   return (

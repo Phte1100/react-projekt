@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAllBookItems, deleteBookItem, likeBookItem } from "../services/BookService";
 import Modal from "./Modal";
 import EditBookItem from "./EditBookItem";
+import { toast } from "react-toastify";
 
 interface BookItem {
   isbn: string;
@@ -43,36 +44,41 @@ const BookListLoggedIn: React.FC = () => {
       console.error("Error fetching books:", error);
     }
   };
-  
 
-    const handleDelete = async (isbn: string) => {
-      try {
-        if (!token) {
-          console.error("Unauthorized: No token found.");
-          return;
-        }
-        await deleteBookItem(isbn, token); // Skickar token
-        fetchBooks();
-      } catch (error) {
-        console.error("Error deleting book:", error);
+  const handleDelete = async (isbn: string) => {
+    try {
+      if (!token) {
+        console.error("Unauthorized: No token found.");
+        return;
       }
-    };
-    
-    const handleLike = async (isbn: string) => {
-      try {
-        if (!token) {
-          console.error("Unauthorized: No token found.");
-          return;
-        }
-    
-        await likeBookItem(isbn, token);
-        fetchBooks(); // Uppdatera böckerna efter toggling
-      } catch (error) {
-        console.error("Error toggling like:", error);
+
+      await deleteBookItem(isbn, token); 
+      toast.success("Boken har raderats!"); //Visa bekräftelse
+      fetchBooks();
+    } catch (error) {
+      toast.error("Kunde inte radera boken."); //Visa felmeddelande
+      console.error("Error deleting book:", error);
+    }
+  };
+
+  const handleLike = async (isbn: string) => {
+    try {
+      if (!token) {
+        console.error("Unauthorized: No token found.");
+        return;
       }
-    };
-        
   
+      await likeBookItem(isbn, token);
+      fetchBooks();
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
+  };
+
+  const handleUpdateSuccess = () => {
+    toast.success("Boken har uppdaterats!"); // Notis vid PUT
+    fetchBooks();
+  };
 
   return (
     <div>
@@ -82,6 +88,7 @@ const BookListLoggedIn: React.FC = () => {
             <th>Bild</th>
             <th>Titel</th>
             <th>Författare</th>
+            <th>ISBN</th>
             <th>Utgivningsår</th>
             <th>Genre</th>
             <th>Format</th>
@@ -101,6 +108,7 @@ const BookListLoggedIn: React.FC = () => {
               </td>
               <td>{item.title}</td>
               <td>{item.author}</td>
+              <td>{item.isbn}</td>
               <td>{item.publishedYear}</td>
               <td>{item.genre}</td>
               <td>{item.format}</td>
@@ -134,24 +142,23 @@ const BookListLoggedIn: React.FC = () => {
       </table>
 
       {token && selectedItemId && (
-  <Modal
-    isOpen={isModalOpen}
-    onClose={() => {
-      setIsModalOpen(false);
-      setSelectedItemId(null); // Återställ ID
-    }}
-  >
-    <EditBookItem
-      bookItemId={selectedItemId}
-      onClose={() => {
-        setIsModalOpen(false);
-        setSelectedItemId(null);
-      }}
-      refreshBook={fetchBooks}
-    />
-  </Modal>
-)}
-
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedItemId(null);
+          }}
+        >
+          <EditBookItem
+            bookItemId={selectedItemId}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedItemId(null);
+            }}
+            refreshBook={handleUpdateSuccess} //Notis vid PUT
+          />
+        </Modal>
+      )}
     </div>
   );
 };

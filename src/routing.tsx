@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DetailPage from "./pages/DetailPage";
 import RegisterPage from "./pages/RegisterPage";
+import UserPage from "./pages/UserPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -19,7 +20,7 @@ const router = createBrowserRouter([
             {
                 path: "/Cms",
                 element: (
-                <ProtectedRoute>
+                <ProtectedRoute requiredRoles={["admin", "editor"]}>
                 <CmsPage />
                 </ProtectedRoute>
             )
@@ -30,11 +31,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/book/:isbn",
-                element: <DetailPage /> // Lägg till route för enskilda menyobjekt
+                element: <DetailPage />
             },
             {
                 path: "/register",
                 element: <RegisterPage />
+            },
+            {
+                path: "/users",
+                element: (
+                  <ProtectedRoute requiredRoles={["admin"]}>
+                    <UserPage />
+                  </ProtectedRoute>
+                ),
             }
         ]
     }

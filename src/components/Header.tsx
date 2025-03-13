@@ -1,35 +1,49 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const [isActive, setIsActive] = useState(false); // Håller koll på om menyn är öppen
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation" style={{ marginRight: "5%", marginLeft: "5%" }}>
       <div className="navbar-brand">
         <NavLink to="/"><h1 className="title is-2">Moment 4</h1></NavLink>
 
-        <a role="button" className="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        {/* Hamburgarikonen med klickhändelse */}
+        <a 
+          role="button" 
+          className={`navbar-burger ${isActive ? "is-active" : ""}`} 
+          aria-label="menu" 
+          aria-expanded={isActive} 
+          onClick={() => setIsActive(!isActive)}
+        >
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </a>
       </div>
 
-      <div className="navbar-menu">
+      {/* Navigationsmeny - visas endast om isActive är true */}
+      <div className={`navbar-menu ${isActive ? "is-active" : ""}`}>
         <div className="navbar-start">
           <NavLink to="/" className="navbar-item">
             Start
           </NavLink>
 
-          {/* Visa "Administrera" endast för admin och editor */}
           {(user?.role === "admin" || user?.role === "editor") && (
             <NavLink to="/Cms" className="navbar-item">
               Administrera
             </NavLink>
           )}
 
-          {/* Visa "Registrera" endast om användaren INTE är inloggad */}
+          {(user?.role === "admin") && (
+            <NavLink to="/users" className="navbar-item">
+              Användare
+            </NavLink>
+          )}
+
           {!user && (
             <NavLink to="/register" className="navbar-item">
               Registrera
