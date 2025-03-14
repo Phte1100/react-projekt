@@ -8,7 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import "react-toastify/dist/ReactToastify.css";
 
 
-function App() {
+function App() { // Lägg till routes för alla sidor
   return (
     <Router>
       <Routes>

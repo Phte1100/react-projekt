@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Valideringsschema
-const schema = yup.object().shape({
+const schema = yup.object().shape({ // Skapa ett valideringsschema med Yup
   isbn: yup
     .string()
     .matches(/^\d+$/, "Endast siffror tillåtna")
@@ -18,11 +18,11 @@ const schema = yup.object().shape({
   format: yup.string().required("Format måste väljas"),
 });
 
-const AddBookItem: React.FC = () => {
+const AddBookItem: React.FC = () => { 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  const {
+  const { // React Hook Form
     register,
     handleSubmit,
     formState: { errors },
@@ -33,7 +33,7 @@ const AddBookItem: React.FC = () => {
     try {
       await createBookItem(data, token);
       toast.success("Bok tillagd!");
-      navigate("/");
+      navigate("/cms");
     } catch (error) {
       toast.error("Misslyckades med att lägga till boken");
       console.error("Error creating book item:", error);

@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation" style={{ marginRight: "5%", marginLeft: "5%" }}>
       <div className="navbar-brand">
-        <NavLink to="/"><h1 className="title is-2">Moment 4</h1></NavLink>
+        <NavLink to="/"><h1 className="title is-2">EzReadz</h1></NavLink>
 
         {/* Hamburgarikonen med klickhändelse */}
         <a 
@@ -32,19 +32,19 @@ const Header = () => {
             Start
           </NavLink>
 
-          {(user?.role === "admin" || user?.role === "editor") && (
+          {(user?.role === "admin" || user?.role === "editor") && ( //Visa länk om användaren är admin eller redaktör
             <NavLink to="/Cms" className="navbar-item">
               Administrera
             </NavLink>
           )}
 
-          {(user?.role === "admin") && (
+          {(user?.role === "admin") && ( //Visa länk om användaren är admin
             <NavLink to="/users" className="navbar-item">
               Användare
             </NavLink>
           )}
 
-          {!user && (
+          {!user && ( //Visa länkar om användaren inte är inloggad
             <NavLink to="/register" className="navbar-item">
               Registrera
             </NavLink>

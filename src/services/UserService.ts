@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:3000";
+const API_URL = "https://react-backend-t6ht.onrender.com";
 
 // Hämta alla användare (kräver admin-token)
 const getUsers = (token: string | null) =>

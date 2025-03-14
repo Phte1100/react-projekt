@@ -12,16 +12,16 @@ interface Review {
   created_at: string;
 }
 
-interface BookReviewsProps {
+interface BookReviewsProps { // Skapa en interface för props
   isbn: string;
 }
 
 const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [newReview, setNewReview] = useState({ rating: 5, review_text: "" });
-  const token = localStorage.getItem("token");
+  const [reviews, setReviews] = useState<Review[]>([]); // Skapa en state för recensioner
+  const [newReview, setNewReview] = useState({ rating: 5, review_text: "" }); // Skapa en state för ny recension
+  const token = localStorage.getItem("token"); // Hämta token från localStorage
 
-  // ✅ Hämta `user_id` från JWT-tokenet (om det finns)
+  // Hämta `user_id` från JWT-tokenet (om det finns)
   let userId: number | null = null;
   if (token) {
     try {
@@ -32,12 +32,12 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
     }
   }
 
-  useEffect(() => {
+  useEffect(() => { // Hämta recensioner när komponenten laddas
     if (!isbn) return;
     fetchReviews();
   }, [isbn]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = async () => { // Funktion för att hämta recensioner
     try {
       const response = await getReviewsForBook(isbn);
       setReviews(response.data);
@@ -46,7 +46,7 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
     }
   };
 
-  const handleReviewSubmit = async (event: React.FormEvent) => {
+  const handleReviewSubmit = async (event: React.FormEvent) => { // Funktion för att skicka recension
     event.preventDefault();
     if (!isbn || !token || userId === null) return; // Kontrollera att vi har en giltig användare
 
@@ -61,12 +61,12 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
     }
   };
 
-  const handleDeleteReview = async (reviewId: number) => {
+  const handleDeleteReview = async (reviewId: number) => { // Funktion för att ta bort recension
     if (!token || userId === null) return;
 
     try {
       console.log("Försöker ta bort recension med ID:", reviewId);
-      await deleteReview(reviewId, token, userId); // ✅ Skicka `userId` med anropet
+      await deleteReview(reviewId, token, userId); // Skicka `userId` med anropet
       fetchReviews();
     } catch (error) {
       console.error("Error deleting review:", error);
@@ -84,7 +84,7 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
             <p>{review.review_text}</p>
             <p className="is-size-7 has-text-grey">{new Date(review.created_at).toLocaleString()}</p>
 
-            {/* ✅ Visa "Ta bort" endast om användaren skrev recensionen */}
+            {/* Visa "Ta bort" endast om användaren skrev recensionen */}
             {userId === review.user_id && (
               <button 
                 className="button is-small is-danger"

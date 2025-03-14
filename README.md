@@ -1,54 +1,36 @@
-# React + TypeScript + Vite
+# EzReadz – En plats för böcker och recensioner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+EzReadz är en webbapp där användare kan lägga till böcker automatiskt med ISBN, gilla sina favoriter och skriva recensioner. Målet är att skapa en smidig plattform där användare kan utforska böcker, se vad andra tycker och bidra med egna åsikter. Applikationen består av en frontend byggd i React och en backend byggs med Fastify. Boken hämtas automatiskt med hjälp av Google Books API.
 
-Currently, two official plugins are available:
+## Funktioner i applikationen
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Användare kan söka efter böcker och se detaljerad information som titel, författare, beskrivning och genrer. Om en bok inte redan finns i systemet kan en användare som är inloggad lägga till den med hjälp av ISBN. Böcker kan gillas av användare och recensioner kan skrivas för att dela tankar om en bok. Gilla-markeringar och recensioner lagras i backend och är kopplade till användarkonton.
 
-## Expanding the ESLint configuration
+## Hantering av state och dynamiskt innehåll
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+För att hantera dynamiskt innehåll används useState och useEffect. När en användare exempelvis söker efter en bok eller lägger till en ny recension uppdateras UI i realtid. När boklistan laddas in från backend används en laddningsanimation som visas tills datan har hämtats. React Router används för navigering mellan sidor, så att användare enkelt kan klicka sig vidare till bokdetaljer, inloggning eller andra funktioner.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Validering av formulär
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Alla inmatningsfält har validering med Yup och react-hook-form. Exempelvis måste lösenord vara minst sex tecken långt, innehålla en siffra och ett specialtecken. Användarnamn får bara innehålla bokstäver och siffror, och e-postadresser måste vara i rätt format. Detta säkerställer att användarinformationen är korrekt innan den skickas till backend.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Användarroller och åtkomst
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+Webbappen har olika användarroller som styr vilka funktioner en användare har tillgång till. En vanlig användare kan söka efter böcker, gilla böcker och skriva recensioner. En redaktör har tillgång till en adminsida och kan lägga till och ändra böcker. En admin har utökade rättigheter och kan hantera användare samt radera böcker och recensioner. Rollerna hanteras med hjälp av JWT-tokens som skickas med varje förfrågan till backend.
+
+## Backend och datalagring
+
+Backend är byggd med Fastify. Det hanterar API-förfrågningar, autentisering och datalagring i en MySQL-databas. När en användare loggar in valideras deras uppgifter mot databasen och en JWT-token genereras. Bokdata hämtas antingen från backend eller direkt från Google Books API om boken inte redan finns i systemet.
+
+## Installerade paket
+
+- **React** – Bibliotek för att bygga användargränssnitt.  
+- **React Router** – Hanterar sidnavigering.  
+- **React Hook Form** – Enkel hantering av formulär.  
+- **Yup** – Validering av formulärinmatningar.  
+- **Axios** – Skickar och hämtar data från backend.  
+- **React Toastify** – Visar notifikationer.  
+- **React Spinners** – Laddningsanimationer.  
+- **Bulma** – CSS-ramverk för responsiv design.  
+- **React Awesome Loaders** – Extra laddningsanimationer.  
+- **React Icons** – Ikonbibliotek för UI.  

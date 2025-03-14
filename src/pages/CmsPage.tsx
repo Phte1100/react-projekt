@@ -10,8 +10,8 @@ const CmsPage = () => {
   return (
     <>
       <h1 className="title is-1">Hej, {user ? `${user.username}` : ""}</h1>
-      <AddMenuItem />
-      <MenuListLoggedIn />
+      <AddMenuItem /> {/* laddar komponenten för att lägga till ny bok */}
+      <MenuListLoggedIn /> {/* laddar komponenten för att visa listan med böcker */}
     </>
   );
 }

@@ -40,13 +40,16 @@ const RegisterPage = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      await registerUser(data);
+      const payload = { ...data, role: "user" }; // Lägg till en standardroll
+      await registerUser(payload);
       toast.success("Användare skapad! Omdirigerar till inloggning...");
-      setTimeout(() => navigate("/login"), 2000); // Omdirigering efter 2 sek
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
+      console.error("Registrering misslyckades:", error);
       toast.error("Registrering misslyckades. Försök igen.");
     }
   };
+  
 
   return (
     <>

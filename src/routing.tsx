@@ -8,7 +8,7 @@ import DetailPage from "./pages/DetailPage";
 import RegisterPage from "./pages/RegisterPage";
 import UserPage from "./pages/UserPage.tsx";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter([ // Skapa en router med de olika sidorna
     {
         path: "/",
         element: <Layout />,
@@ -18,7 +18,7 @@ const router = createBrowserRouter([
                 element: <HomePage />
             },
             {
-                path: "/Cms",
+                path: "/Cms", // Skapa en skyddad route för CmsPage, endast för admin och editor
                 element: (
                 <ProtectedRoute requiredRoles={["admin", "editor"]}>
                 <CmsPage />
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/users",
-                element: (
+                element: ( // Skapa en skyddad route för UserPage, endast för admin
                   <ProtectedRoute requiredRoles={["admin"]}>
                     <UserPage />
                   </ProtectedRoute>

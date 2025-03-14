@@ -1,14 +1,15 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import { User, LoginCredentials, AuthResponse, AuthContextType } from "../types/auth.types";
+import { toast } from "react-toastify";
 
 // Skapa context
 const AuthContext = createContext<AuthContextType | null>(null);
 
-interface AuthProviderProps {
+interface AuthProviderProps { // Skapa en interface för props
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => { // Skapa en provider för autentisering
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
 
@@ -24,7 +25,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     
         try {
-            const res = await fetch("http://127.0.0.1:3000/validate", {
+            const res = await fetch("https://react-backend-t6ht.onrender.com/validate", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,10 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
     
             const data = await res.json();
-            console.log("Token är giltig:", data.user, data.username); //Debug-logga
             setUser(data.user);
         } catch (error) {
-            console.error("Token validation failed:", error);
             localStorage.removeItem("token");
             setUser(null);
             setToken(null);
@@ -58,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Login-funktion
     const login = async (credentials: LoginCredentials) => {
         try {
-            const response = await fetch("http://127.0.0.1:3000/login", {
+            const response = await fetch("https://react-backend-t6ht.onrender.com/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -84,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
         setToken(null);
         localStorage.removeItem("token");
+        toast.success("Du har loggats ut!");
     };
 
     return (

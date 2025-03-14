@@ -22,7 +22,7 @@ const DetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
+  useEffect(() => { // Hämtar bokobjektet när komponenten laddas
     if (!isbn) return;
 
     const fetchBookItem = async () => {
@@ -30,7 +30,7 @@ const DetailPage: React.FC = () => {
         const response = await getBookItemByISBN(isbn, token);
         const bookData = response.data;
     
-        // 🔄 Mappa om `published_year` till `publishedYear`
+        //Mappa om `published_year` till `publishedYear`
         const mappedBook = {
           ...bookData,
           publishedYear: bookData.published_year ?? 0, 

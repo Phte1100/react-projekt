@@ -1,7 +1,7 @@
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
-import { ToastContainer } from "react-toastify"; // ✅ Importera ToastContainer
-import "react-toastify/dist/ReactToastify.css"; // ✅ Importera toast-stilar
+import { ToastContainer } from "react-toastify"; //Importera ToastContainer
+import "react-toastify/dist/ReactToastify.css"; //Importera toast-stilar
 
 const Layout = () => { 
     return (
@@ -13,7 +13,7 @@ const Layout = () => {
           </div>
         </main>
         
-        {/* ✅ Lägg ToastContainer här så att den alltid finns på sidan */}
+        {/* Lägg ToastContainer här så att den alltid finns på sidan */}
         <ToastContainer position="top-right" autoClose={3000} />
 
         <footer className="footer">

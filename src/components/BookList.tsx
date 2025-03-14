@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllBookItems, likeBookItem } from "../services/BookService";
-import { NavLink, useNavigate } from "react-router-dom"; // 🔄 För navigering
+import { NavLink, useNavigate } from "react-router-dom";
+import ClipLoader from "react-spinners/ClipLoader"; // Laddningsindikator
 
 interface BookItem {
   isbn: string;
@@ -16,46 +17,47 @@ interface BookItem {
   userHasLiked: boolean;
 }
 
-
 const BookList: React.FC = () => {
-  const [bookItems, setBookItems] = useState<BookItem[]>([]);
-  const [filteredBooks, setFilteredBooks] = useState<BookItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState(""); 
-  const token = localStorage.getItem("token");
-  const navigate = useNavigate(); // 🔄 Används för att omdirigera användaren
+  const [bookItems, setBookItems] = useState<BookItem[]>([]); // Skapar en state för bokobjekten
+  const [filteredBooks, setFilteredBooks] = useState<BookItem[]>([]); // Skapar en state för filtrerade bokobjekt
+  const [searchQuery, setSearchQuery] = useState(""); // Skapar en state för söksträng
+  const [loading, setLoading] = useState(true); // Laddningsstatus
+  const token = localStorage.getItem("token");// Hämta token från localStorage
+  const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect(() => { // Hämta bokobjekten när komponenten laddas
     fetchBooks();
   }, []);
-  
-  const fetchBooks = async () => {
+
+  const fetchBooks = async () => { // Funktion för att hämta bokobjekten
     try {
+      setLoading(true); // Starta laddning
       const response = await getAllBookItems();
-      console.log("API Response:", response.data); // Logga för att se om publishedYear finns
       setBookItems(response.data);
       setFilteredBooks(response.data);
     } catch (error) {
       console.error("Error fetching books:", error);
+    } finally {
+      setLoading(false); // Stäng av loading när API-anropet är klart
     }
   };
-  
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-
-    const filtered = bookItems.filter(
-      (book) =>
-        book.title.toLowerCase().includes(query) ||
-        book.author.toLowerCase().includes(query)
+    setFilteredBooks(
+      bookItems.filter(
+        (book) =>
+          book.title.toLowerCase().includes(query) ||
+          book.author.toLowerCase().includes(query)
+      )
     );
-    setFilteredBooks(filtered);
   };
 
   const handleLike = async (isbn: string) => {
     if (!token) {
       console.warn(" Ingen token – omdirigerar till login");
-      navigate("/login"); // 🔄 Skickar användaren till login-sidan
+      navigate("/login");
       return;
     }
 
@@ -67,9 +69,17 @@ const BookList: React.FC = () => {
     }
   };
 
+  // Om laddning pågår, visa en spinner istället för listan
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
+        <ClipLoader size={80} color={"#6c757d"} />
+      </div>
+    );
+  }
+
   return (
     <div>
-
       {/* Sökfält */}
       <div className="field">
         <div className="control">
@@ -91,11 +101,10 @@ const BookList: React.FC = () => {
               <div className="card-image">
                 <figure className="image">
                   <NavLink to={`/book/${item.isbn}`}>
-                    {item.thumbnail ? (
-                      <img src={item.thumbnail} alt={item.title} />
-                    ) : (
-                      <div className="has-text-centered">Ingen bild</div>
-                    )}
+                    <img 
+                      src={item.thumbnail ? item.thumbnail : "https://placehold.co/300x459"} 
+                      alt={item.title} 
+                    />
                   </NavLink>
                 </figure>
               </div>
@@ -112,23 +121,16 @@ const BookList: React.FC = () => {
                 </NavLink>
 
                 <div className="content">
-                  <br></br>
-                <p><strong>ISBN:</strong> {item.isbn}</p>
-                
-                <p><strong>Utgivningsår:</strong> {item.publishedYear || "Okänt"}</p>
-                
-                  <p>
-                    <strong>Genre:</strong> {item.genre || "Ingen genre"}
-                  </p>
-                  <p>
-                    <strong>⭐ Betyg:</strong>{" "}
-                    {item.averageRating && item.averageRating > 0
-                      ? Math.round(item.averageRating * 10) / 10 + " ⭐"
-                      : "Saknar rating"}
+                  <p><strong>ISBN:</strong> {item.isbn}</p>
+                  <p><strong>Utgivningsår:</strong> {item.publishedYear || "Okänt"}</p>
+                  <p><strong>Genre:</strong> {item.genre || "Ingen genre"}</p>
+                  <p><strong>⭐ Betyg:</strong> {item.averageRating && item.averageRating > 0
+                    ? Math.round(item.averageRating * 10) / 10 + " ⭐"
+                    : "Saknar rating"}
                   </p>
                 </div>
 
-                {/* 🔥 Like-knappen som skickar användaren till login om den inte är inloggad */}
+                {/* Like-knappen */}
                 <button
                   className={`button is-small ${item.userHasLiked ? "is-danger" : "is-primary"}`}
                   onClick={() => handleLike(item.isbn)}

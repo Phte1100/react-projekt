@@ -1,4 +1,4 @@
-interface ModalProps {
+interface ModalProps { // Skapa en interface för props
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;

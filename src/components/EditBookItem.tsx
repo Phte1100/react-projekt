@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getBookItemByISBN, updateBookItem } from "../services/BookService";
-import { toast } from "react-toastify"; // ✅ Importera toast för bekräftelse
+import { toast } from "react-toastify"; // Importera toast för bekräftelse
 
 interface BookItem {
   isbn: string;
@@ -13,23 +13,23 @@ interface BookItem {
   format?: string;
 }
 
-interface EditBookItemProps {
+interface EditBookItemProps { // Skapa en interface för props
   bookItemId: string | null;
   onClose: () => void;
   refreshBook: () => void;
 }
 
 const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refreshBook }) => {
-  const [bookItem, setBookItem] = useState<BookItem | null>(null);
+  const [bookItem, setBookItem] = useState<BookItem | null>(null); // Skapa en state för bokobjektet
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // Skapa en state för felmeddelande
 
-  useEffect(() => {
+  useEffect(() => { // Hämta bokobjektet när komponenten laddas
     if (!bookItemId) return;
     fetchBookItem(bookItemId);
   }, [bookItemId]);
 
-  const fetchBookItem = async (isbn: string) => {
+  const fetchBookItem = async (isbn: string) => { // Funktion för att hämta bokobjektet
     try {
       setLoading(true);
       setError(null);
@@ -50,12 +50,12 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { // Funktion för att uppdatera state
     const { name, value } = e.target;
     setBookItem((prev) => prev ? { ...prev, [name]: value } : null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => { // Funktion för att uppdatera bokobjektet
     e.preventDefault();
     if (!bookItem) return;
 
@@ -63,13 +63,13 @@ const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refres
       const token = localStorage.getItem("token");
       await updateBookItem(bookItem.isbn, bookItem, token);
       
-      // ✅ Visa en toast-bekräftelse när PUT är klar
+      // Visa en toast-bekräftelse när PUT är klar
       toast.success("Boken har uppdaterats!");
 
       refreshBook();
       onClose();
     } catch (error) {
-      toast.error("Kunde inte uppdatera boken."); // ❌ Visar felmeddelande vid misslyckad uppdatering
+      toast.error("Kunde inte uppdatera boken."); //Visar felmeddelande vid misslyckad uppdatering
       console.error("Error updating book item:", error);
     }
   };

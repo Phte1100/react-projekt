@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:3000";
+const API_URL = "https://react-backend-t6ht.onrender.com";
 
 interface BookItem {
   published_year: number;
@@ -68,12 +68,10 @@ const getReviewsForBook = (isbn: string) =>
 
 // Skapa en ny recension (kräver autentisering)
 const addReview = (isbn: string, rating: number, review_text: string, token: string | null, userId: number) => {
-  console.log("Skickar token:", token); // 🛠 Logga token
-  console.log("Skickar user_id:", userId); // 🛠 Logga user_id
 
   return axios.post(
     `${API_URL}/books/${isbn}/reviews`,
-    { user_id: userId, rating, review_text }, // ✅ Skicka `user_id`
+    { user_id: userId, rating, review_text }, // Skicka `user_id`
     {
       headers: { 
         Authorization: `Bearer ${token}`,

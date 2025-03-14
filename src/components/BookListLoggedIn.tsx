@@ -19,9 +19,9 @@ interface BookItem {
 }
 
 const BookListLoggedIn: React.FC = () => {
-  const [bookItems, setBookItems] = useState<BookItem[]>([]);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bookItems, setBookItems] = useState<BookItem[]>([]); // Skapar en state för bokobjekten
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // Skapar en state för vald bok
+  const [isModalOpen, setIsModalOpen] = useState(false); // Skapar en state för att visa modal
 
   const token = localStorage.getItem("token");
 
@@ -45,7 +45,7 @@ const BookListLoggedIn: React.FC = () => {
     }
   };
 
-  const handleDelete = async (isbn: string) => {
+  const handleDelete = async (isbn: string) => { // Funktion för att radera bok
     try {
       if (!token) {
         console.error("Unauthorized: No token found.");
@@ -61,7 +61,7 @@ const BookListLoggedIn: React.FC = () => {
     }
   };
 
-  const handleLike = async (isbn: string) => {
+  const handleLike = async (isbn: string) => { // Funktion för att gilla en bok
     try {
       if (!token) {
         console.error("Unauthorized: No token found.");
@@ -75,8 +75,7 @@ const BookListLoggedIn: React.FC = () => {
     }
   };
 
-  const handleUpdateSuccess = () => {
-    toast.success("Boken har uppdaterats!"); // Notis vid PUT
+  const handleUpdateSuccess = () => { // Funktion för att uppdatera boklistan efter PUT
     fetchBooks();
   };
 
@@ -141,7 +140,7 @@ const BookListLoggedIn: React.FC = () => {
         </tbody>
       </table>
 
-      {token && selectedItemId && (
+      {token && selectedItemId && ( //Visa modal om användaren är inloggad och en bok är vald
         <Modal
           isOpen={isModalOpen}
           onClose={() => {
