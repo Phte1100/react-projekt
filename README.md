@@ -34,3 +34,8 @@ Backend är byggd med Fastify. Det hanterar API-förfrågningar, autentisering o
 - **Bulma** – CSS-ramverk för responsiv design.  
 - **React Awesome Loaders** – Extra laddningsanimationer.  
 - **React Icons** – Ikonbibliotek för UI.  
+
+## Inlogg
+
+**Användarnamn:** admin
+**Lösenord:** Admin123!
