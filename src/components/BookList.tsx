@@ -60,14 +60,31 @@ const BookList: React.FC = () => {
       navigate("/login");
       return;
     }
-
+  
     try {
       await likeBookItem(isbn, token);
-      fetchBooks(); // Uppdatera listan efter gilla
+  
+      // Uppdatera UI:t direkt utan att anropa fetchBooks()
+      setBookItems((prevBooks) =>
+        prevBooks.map((book) =>
+          book.isbn === isbn
+            ? { ...book, userHasLiked: !book.userHasLiked, likes: book.userHasLiked ? book.likes - 1 : book.likes + 1 }
+            : book
+        )
+      );
+  
+      setFilteredBooks((prevBooks) =>
+        prevBooks.map((book) =>
+          book.isbn === isbn
+            ? { ...book, userHasLiked: !book.userHasLiked, likes: book.userHasLiked ? book.likes - 1 : book.likes + 1 }
+            : book
+        )
+      );
     } catch (error) {
       console.error("Error toggling like:", error);
     }
   };
+  
 
   // Om laddning pågår, visa en spinner istället för listan
   if (loading) {

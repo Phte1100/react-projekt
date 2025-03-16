@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { getReviewsForBook, addReview, deleteReview } from "../services/BookService";
+import { getReviewsForBook, addReview, deleteReview, updateReview } from "../services/BookService";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Review {
   id: number;
@@ -12,65 +14,82 @@ interface Review {
   created_at: string;
 }
 
-interface BookReviewsProps { // Skapa en interface för props
+interface BookReviewsProps {
   isbn: string;
 }
 
 const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
-  const [reviews, setReviews] = useState<Review[]>([]); // Skapa en state för recensioner
-  const [newReview, setNewReview] = useState({ rating: 5, review_text: "" }); // Skapa en state för ny recension
-  const token = localStorage.getItem("token"); // Hämta token från localStorage
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState({ rating: 5, review_text: "" });
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const token = localStorage.getItem("token");
 
-  // Hämta `user_id` från JWT-tokenet (om det finns)
   let userId: number | null = null;
+  let userRole: string | null = null;
+
   if (token) {
     try {
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       userId = decodedToken.id;
+      userRole = decodedToken.role;
     } catch (error) {
       console.error("Error decoding token:", error);
     }
   }
 
-  useEffect(() => { // Hämta recensioner när komponenten laddas
+  useEffect(() => {
     if (!isbn) return;
     fetchReviews();
   }, [isbn]);
 
-  const fetchReviews = async () => { // Funktion för att hämta recensioner
+  const fetchReviews = async () => {
     try {
       const response = await getReviewsForBook(isbn);
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      toast.error("Kunde inte hämta recensioner.");
     }
   };
 
-  const handleReviewSubmit = async (event: React.FormEvent) => { // Funktion för att skicka recension
+  const handleReviewSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!isbn || !token || userId === null) return; // Kontrollera att vi har en giltig användare
+    if (!isbn || !token || userId === null) return;
 
     try {
-      console.log("Skickar recension till API:", { user_id: userId, book_isbn: isbn, rating: newReview.rating, review_text: newReview.review_text });
-      
-      await addReview(isbn, newReview.rating, newReview.review_text, token, userId);
+      if (editingReview) {
+        await updateReview(editingReview.id, newReview.rating, newReview.review_text, token, userId);
+        toast.success("Recension uppdaterad!");
+        setEditingReview(null);
+      } else {
+        await addReview(isbn, newReview.rating, newReview.review_text, token, userId);
+        toast.success("Recension tillagd!");
+      }
+
       setNewReview({ rating: 5, review_text: "" });
       fetchReviews();
     } catch (error) {
-      console.error("Error adding review:", error);
+      console.error("Error submitting review:", error);
+      toast.error("Misslyckades med att skicka recension.");
     }
   };
 
-  const handleDeleteReview = async (reviewId: number) => { // Funktion för att ta bort recension
+  const handleDeleteReview = async (reviewId: number) => {
     if (!token || userId === null) return;
 
     try {
-      console.log("Försöker ta bort recension med ID:", reviewId);
-      await deleteReview(reviewId, token, userId); // Skicka `userId` med anropet
+      await deleteReview(reviewId, token, userId);
+      toast.success("Recension borttagen!");
       fetchReviews();
     } catch (error) {
       console.error("Error deleting review:", error);
+      toast.error("Misslyckades med att ta bort recension.");
     }
+  };
+
+  const handleEditReview = (review: Review) => {
+    setNewReview({ rating: review.rating, review_text: review.review_text });
+    setEditingReview(review);
   };
 
   return (
@@ -82,15 +101,25 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
           <div key={review.id} className="box">
             <p><strong>{review.username}</strong> ({review.rating} ⭐)</p>
             <p>{review.review_text}</p>
-            <p className="is-size-7 has-text-grey">{new Date(review.created_at).toLocaleString()}</p>
+            <p className="is-size-7 has-text-grey">
+              {new Date(review.created_at).toLocaleString()} - Skriven av: <strong>{review.username}</strong>
+            </p>
 
-            {/* Visa "Ta bort" endast om användaren skrev recensionen */}
-            {userId === review.user_id && (
-              <button 
-                className="button is-small is-danger"
+            {(userId === review.user_id || userRole === "admin") && (
+              <button
+                className="button is-small is-danger mr-2"
                 onClick={() => handleDeleteReview(review.id)}
               >
                 🗑 Ta bort
+              </button>
+            )}
+
+            {userId === review.user_id && (
+              <button
+                className="button is-small is-warning"
+                onClick={() => handleEditReview(review)}
+              >
+                ✏ Uppdatera
               </button>
             )}
           </div>
@@ -101,7 +130,7 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
 
       {token && (
         <form onSubmit={handleReviewSubmit} className="box">
-          <h3 className="title is-5">Skriv en recension</h3>
+          <h3 className="title is-5">{editingReview ? "Uppdatera recension" : "Skriv en recension"}</h3>
           <div className="field">
             <label className="label">Betyg</label>
             <div className="control">
@@ -131,7 +160,9 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
 
           <div className="field">
             <div className="control">
-              <button className="button is-primary" type="submit">Skicka</button>
+              <button className="button is-primary" type="submit">
+                {editingReview ? "Uppdatera" : "Skicka"}
+              </button>
             </div>
           </div>
         </form>
@@ -139,7 +170,5 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
     </div>
   );
 };
-
-
 
 export default BookReviews;

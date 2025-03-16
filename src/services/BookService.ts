@@ -81,6 +81,20 @@ const addReview = (isbn: string, rating: number, review_text: string, token: str
   );
 };
 
+const updateReview = (reviewId: number, rating: number, review_text: string, token: string | null, userId: number) => {
+  return axios.put(
+    `${API_URL}/reviews/${reviewId}`,
+    { user_id: userId, rating, review_text },
+    {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};
+
+// Radera en recension (kräver autentisering)
 const deleteReview = (reviewId: number, token: string | null, userId: number) =>
   axios.delete(`${API_URL}/reviews/${reviewId}`, {
     headers: { 
@@ -95,6 +109,7 @@ export { registerUser };
 
 
 export { 
+  updateReview,
   getAllBookItems, 
   getBookItemByISBN, 
   createBookItem, 
