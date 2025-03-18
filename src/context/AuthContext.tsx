@@ -76,6 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => { // 
         } catch (error) {
             throw error;
         }
+        
     };
 
     // Logout-funktion

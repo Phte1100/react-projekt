@@ -54,14 +54,6 @@ const likeBookItem = (isbn: string, token: string | null) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-// Skapa en ny användare (registrering)
-const registerUser = (userData: { username: string; email: string; password: string; role: string }) =>
-  axios.post(`${API_URL}/users`, userData, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
 // Hämta recensioner för en bok
 const getReviewsForBook = (isbn: string) =>
   axios.get(`${API_URL}/books/${isbn}/reviews`);
@@ -103,10 +95,6 @@ const deleteReview = (reviewId: number, token: string | null, userId: number) =>
     },
     data: { user_id: userId } // Skicka user_id i request-body
   });
-
-
-export { registerUser };
-
 
 export { 
   updateReview,

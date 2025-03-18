@@ -2,6 +2,14 @@ import axios from "axios";
 
 const API_URL = "https://react-backend-t6ht.onrender.com";
 
+// Skapa en ny användare (registrering)
+const registerUser = (userData: { username: string; email: string; password: string; role: string }) =>
+  axios.post(`${API_URL}/users`, userData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
 // Hämta alla användare (kräver admin-token)
 const getUsers = (token: string | null) =>
   axios.get(`${API_URL}/users`, {
@@ -20,4 +28,4 @@ const deleteUser = (userId: number, token: string | null) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export { getUsers, updateUser, deleteUser };
+export {registerUser, getUsers, updateUser, deleteUser };

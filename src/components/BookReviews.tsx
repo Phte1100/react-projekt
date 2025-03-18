@@ -110,7 +110,7 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
                 className="button is-small is-danger mr-2"
                 onClick={() => handleDeleteReview(review.id)}
               >
-                🗑 Ta bort
+                Ta bort
               </button>
             )}
 
@@ -119,7 +119,7 @@ const BookReviews: React.FC<BookReviewsProps> = ({ isbn }) => {
                 className="button is-small is-warning"
                 onClick={() => handleEditReview(review)}
               >
-                ✏ Uppdatera
+                Uppdatera
               </button>
             )}
           </div>

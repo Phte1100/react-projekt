@@ -21,7 +21,7 @@ interface EditBookItemProps { // Skapa en interface för props
 
 const EditBookItem: React.FC<EditBookItemProps> = ({ bookItemId, onClose, refreshBook }) => {
   const [bookItem, setBookItem] = useState<BookItem | null>(null); // Skapa en state för bokobjektet
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true); // Skapa en state för laddningsstatus
   const [error, setError] = useState<string | null>(null); // Skapa en state för felmeddelande
 
   useEffect(() => { // Hämta bokobjektet när komponenten laddas
